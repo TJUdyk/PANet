@@ -17,13 +17,27 @@ class RandomMirror(object):
     def __call__(self, sample):
         img, label = sample['image'], sample['label']
         inst, scribble = sample['inst'], sample['scribble']
+
         if random.random() < 0.5:
+
+            '''
+            # transpose：矩阵的转置，行和列换位置
+            # 1.transpose有这么几种模式
+            FLIP_LEFT_RIGHT ，FLIP_TOP_BOTTOM ，ROTATE_90 ，ROTATE_180 ，ROTATE_270，TRANSPOSE ，TRANSVERSE
+            使用FLIP_LEFT_RIGHT相当于左右镜像图像;FLIP_TOP_BOTTOM相当于上下镜像图像;ROTATE_90逆时针旋转90度TRANSPOSE像素矩阵转置
+            '''
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
+            '''
+            isinstance() 与 type() 区别：   
+            type() 不会认为子类是一种父类类型，不考虑继承关系。
+            isinstance() 会认为子类是一种父类类型，考虑继承关系。
+            '''
             if isinstance(label, dict):
                 label = {catId: x.transpose(Image.FLIP_LEFT_RIGHT)
                          for catId, x in label.items()}
             else:
                 label = label.transpose(Image.FLIP_LEFT_RIGHT)
+
             inst = inst.transpose(Image.FLIP_LEFT_RIGHT)
             scribble = scribble.transpose(Image.FLIP_LEFT_RIGHT)
 
@@ -46,12 +60,22 @@ class Resize(object):
     def __call__(self, sample):
         img, label = sample['image'], sample['label']
         inst, scribble = sample['inst'], sample['scribble']
+        '''
+            class torchvision.transforms.CenterCrop(size) 在中心处裁剪PIL图片。
+            class torchvision.transforms.FiveCrop(size) 从四角和中心裁剪PIL图片。
+            class torchvision.transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0)
+            随机改变图片的亮度、对比度和饱和度。
+            class torchvision.transforms.Grayscale(num_output_channels=1)把图片转换为灰阶。
+
+        '''
         img = tr_F.resize(img, self.size)
+
         if isinstance(label, dict):
             label = {catId: tr_F.resize(x, self.size, interpolation=Image.NEAREST)
                      for catId, x in label.items()}
         else:
             label = tr_F.resize(label, self.size, interpolation=Image.NEAREST)
+
         inst = tr_F.resize(inst, self.size, interpolation=Image.NEAREST)
         scribble = tr_F.resize(scribble, self.size, interpolation=Image.ANTIALIAS)
 

@@ -54,7 +54,7 @@ class VOC(BaseDataset):
                   'inst': instance_mask,
                   'scribble': scribble_mask}
 
-        # Image-level transformation
+        # Image-level transformatidn
         if self.transforms is not None:
             sample = self.transforms(sample)
         # Save the original image (without normalization)
